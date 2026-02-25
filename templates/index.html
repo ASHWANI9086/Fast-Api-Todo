@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo App</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            padding: 40px;
+        }
+
+        .container {
+            width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .todo {
+            background: #f1f1f1;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Todo App</h2>
+
+    <input id="title" placeholder="Title">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <button onclick="createTodo()">Add Todo</button>
+
+    <div id="todoList"></div>
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:8000/api/v1";
+
+async function loadTodos() {
+    const res = await fetch(`${API}/`);
+    const data = await res.json();
+
+    const list = document.getElementById("todoList");
+    list.innerHTML = "";
+
+    data.forEach(todo => {
+        list.innerHTML += `
+            <div class="todo">
+                <b>${todo.title}</b>
+                <p>${todo.desc}</p>
+                <small>ID: ${todo.id}</small>
+            </div>
+        `;
+    });
+}
+
+async function createTodo() {
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+
+    await fetch(`${API}/create`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            title: title,
+            desc: desc,
+            isComplete: false
+        })
+    });
+
+    loadTodos();
+}
+
+loadTodos();
+
+</script>
+
+</body>
+</html>
